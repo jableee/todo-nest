@@ -5,9 +5,10 @@ import { AppController } from './app.controller';
 import { LoggerMiddleware } from 'src/_commons/middlewares/logger.moddleware';
 import { UserModule } from 'src/user/user.module'
 import { CategoryModule } from './category/category.module'; 
+import { TodoModule } from './todo/todo.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeORMConfig), UserModule, CategoryModule],
+  imports: [TypeOrmModule.forRoot(typeORMConfig), UserModule, CategoryModule, TodoModule],
   controllers: [AppController],
   providers: [],
 })

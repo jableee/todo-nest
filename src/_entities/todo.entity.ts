@@ -18,7 +18,7 @@ export class TodoEntity extends BaseEntity {
     categoryId: number
 
     @Column()
-    userID: number
+    userId: number
 
     @Column({
         type: 'varchar',

@@ -3,7 +3,7 @@ import { CustomHttpException } from "src/_commons/contants/http-exception.contan
 import { TemplateEntity } from "src/_entities/template.entity";
 import { TemplateRepository } from "src/_repository/template.repository";
 import { TemplateRequestDto } from "./dto/template.request.dto";
-import { TemplateIdDto } from "./dto/template.response.dto";
+import { TemplateDto, TemplateIdDto, TemplateListDto } from "./dto/template.response.dto";
 
 @Injectable()
 export class TemplateService {
@@ -32,5 +32,62 @@ export class TemplateService {
 
     const templateId: number = await this.templateRepository.createTemplate(userId, name)
     return { id: templateId }
+  }
+
+  async getTemplates(userId: number): Promise<TemplateListDto> {
+    const templates: Array<TemplateDto> = await this.templateRepository.findAllTemplates(userId)
+
+    return { templates }
+  }
+
+  /**
+   * 템플릿 수정 
+   * @param userId number
+   * @param id number 
+   * @param templateRequestDto TemplateRequestDto 
+   * @returns 
+   */
+  async updateTemplate(
+    userId: number,
+    id: number,
+    templateRequestDto: TemplateRequestDto
+  ): Promise<void> {
+    //템플릿 접근 권한 체크
+    const templateAccess: TemplateEntity = await this.templateRepository.checkTemplateAccess(
+      userId, 
+      id,
+    )
+    if(!templateAccess) {
+      throw new HttpException(CustomHttpException['FORBIDDEN_TEMPLATE'], HttpStatus.FORBIDDEN)
+    }
+    //템플릿 이름 중복 체크 
+    const name: string = templateRequestDto['name']
+    const templateName: TemplateEntity = await this.templateRepository.findTemplateByName(
+      userId,
+      name
+    )
+    if(templateName){
+      throw new HttpException(CustomHttpException['CONFLICT_TEMPLATE'], HttpStatus.CONFLICT)
+    }
+
+    await this.templateRepository.updateTemplate(id, templateRequestDto)
+  }
+
+  /** 
+   * 템플릿 삭제 
+   * @param userId number
+   * @param id number
+   * @returns
+   */
+  async deleteTemplate(userId: number, id: number): Promise<void> {
+    const templateAccess: TemplateEntity = await this.templateRepository.checkTemplateAccess(
+      userId,
+      id
+    )
+    if(!templateAccess){
+      throw new HttpException(CustomHttpException['FORBIDDEN_TEMPLATE'], HttpStatus.FORBIDDEN)
+    }
+
+    await this.templateRepository.deleteTemplate(id)
   }
 }

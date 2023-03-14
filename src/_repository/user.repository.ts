@@ -17,11 +17,9 @@ export class UserRepository {
         where: { email },
         select: ['id', 'email', 'password'],
       });
-			// const user = await this.userRepository.f
 
       return user;
     } catch (error) {
-      console.log(error)
       throw new HttpException(
         CustomHttpException['DB_SERVER_ERROR'],
         HttpStatus.INTERNAL_SERVER_ERROR,
